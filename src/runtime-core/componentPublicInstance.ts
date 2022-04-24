@@ -12,6 +12,7 @@ const publicPropertiesMap = {
 // todo 需要让用户可以直接在 render 函数内直接使用 this 来触发 proxy
 export const PublicInstanceProxyHandlers = {
   get({ _: instance }, key) {
+    debugger
     // 用户访问 proxy[key]
     // 这里就匹配一下看看是否有对应的 function
     // 有的话就直接调用这个 function
@@ -38,6 +39,7 @@ export const PublicInstanceProxyHandlers = {
   },
 
   set({ _: instance }, key, value) {
+    debugger
     const { setupState } = instance;
 
     if (setupState !== {} && hasOwn(setupState, key)) {

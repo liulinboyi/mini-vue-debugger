@@ -9,13 +9,16 @@ import {
 } from "./reactive";
 import { isObject } from "../../shared/index";
 
+/** 创建getter */
 const get = createGetter();
+/** 创建setter */
 const set = createSetter();
 const readonlyGet = createGetter(true);
 const shallowReadonlyGet = createGetter(true, true);
 
 function createGetter(isReadonly = false, shallow = false) {
   return function get(target, key, receiver) {
+    debugger
     const isExistInReactiveMap = () =>
       key === ReactiveFlags.RAW && receiver === reactiveMap.get(target);
 
@@ -65,6 +68,7 @@ function createGetter(isReadonly = false, shallow = false) {
 
 function createSetter() {
   return function set(target, key, value, receiver) {
+    debugger
     const result = Reflect.set(target, key, value, receiver);
 
     // 在触发 set 的时候进行触发依赖
@@ -86,6 +90,7 @@ export const readonlyHandlers = {
   },
 };
 
+/** 可变的句柄 */
 export const mutableHandlers = {
   get,
   set,

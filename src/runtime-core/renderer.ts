@@ -8,6 +8,7 @@ import { shouldUpdateComponent } from "./componentRenderUtils";
 import { createAppAPI } from "./createApp";
 
 export function createRenderer(options) {
+  debugger
   const {
     createElement: hostCreateElement,
     setElementText: hostSetElementText,
@@ -19,6 +20,7 @@ export function createRenderer(options) {
   } = options;
 
   const render = (vnode, container) => {
+    debugger
     debug.mainPath("调用 patch")();
     patch(null, vnode, container);
   };
@@ -30,6 +32,7 @@ export function createRenderer(options) {
     anchor = null,
     parentComponent = null
   ) {
+    debugger
     // 基于 n2 的类型来判断
     // 因为 n2 是新的 vnode
     const { type, shapeFlag } = n2;
@@ -45,7 +48,7 @@ export function createRenderer(options) {
         // 这里就基于 shapeFlag 来处理
         if (shapeFlag & ShapeFlags.ELEMENT) {
           console.log("处理 element");
-          processElement(n1, n2, container, anchor, parentComponent);
+          processElement(n1, n2, container, anchor /** 祖先 */, parentComponent);
         } else if (shapeFlag & ShapeFlags.STATEFUL_COMPONENT) {
           console.log("处理 component");
           processComponent(n1, n2, container, parentComponent);
@@ -370,10 +373,11 @@ export function createRenderer(options) {
   }
 
   function mountElement(vnode, container, anchor) {
+    debugger
     const { shapeFlag, props } = vnode;
     // 1. 先创建 element
     // 基于可扩展的渲染 api
-    const el = (vnode.el = hostCreateElement(vnode.type));
+    const el = (vnode.el = hostCreateElement/* createElement */(vnode.type));
 
     // 支持单子组件和多子组件的创建
     if (shapeFlag & ShapeFlags.TEXT_CHILDREN) {
@@ -383,7 +387,7 @@ export function createRenderer(options) {
       // }
       // 这里 children 就是 test ，只需要渲染一下就完事了
       console.log(`处理文本:${vnode.children}`);
-      hostSetElementText(el, vnode.children);
+      hostSetElementText/* createElement */(el, vnode.children);
     } else if (shapeFlag & ShapeFlags.ARRAY_CHILDREN) {
       // 举个栗子
       // render(){
@@ -401,7 +405,7 @@ export function createRenderer(options) {
         // 需要过滤掉vue自身用的key
         // 比如生命周期相关的 key: beforeMount、mounted
         const nextVal = props[key];
-        hostPatchProp(el, key, null, nextVal);
+        hostPatchProp/* patchProp */(el, key, null, nextVal);
       }
     }
 
@@ -412,7 +416,7 @@ export function createRenderer(options) {
     console.log("transition  -> beforeEnter");
 
     // 插入
-    hostInsert(el, container, anchor);
+    hostInsert/* insert */(el, container, anchor);
 
     // todo
     // 触发 mounted() 钩子
@@ -422,7 +426,9 @@ export function createRenderer(options) {
   }
 
   function mountChildren(children, container) {
+    debugger
     children.forEach((VNodeChild) => {
+      debugger
       // todo
       // 这里应该需要处理一下 vnodeChild
       // 因为有可能不是 vnode 类型
@@ -432,6 +438,7 @@ export function createRenderer(options) {
   }
 
   function processComponent(n1, n2, container, parentComponent) {
+    debugger
     // 如果 n1 没有值的话，那么就是 mount
     if (!n1) {
       // 初始化 component
@@ -443,6 +450,7 @@ export function createRenderer(options) {
 
   // 组件的更新
   function updateComponent(n1, n2, container) {
+    debugger
     console.log("更新组件", n1, n2);
     // 更新组件实例引用
     const instance = (n2.component = n1.component);
@@ -468,6 +476,7 @@ export function createRenderer(options) {
   }
 
   function mountComponent(initialVNode, container, parentComponent) {
+    debugger
     // 1. 先创建一个 component instance
     const instance = (initialVNode.component = createComponentInstance(
       initialVNode,
@@ -481,6 +490,7 @@ export function createRenderer(options) {
   }
 
   function setupRenderEffect(instance, initialVNode, container) {
+    debugger
     // 调用 render
     // 应该传入 ctx 也就是 proxy
     // ctx 可以选择暴露给用户的 api
@@ -494,6 +504,7 @@ export function createRenderer(options) {
     // 依赖收集   effect 函数
     // 触发依赖
     function componentUpdateFn() {
+      debugger
       if (!instance.isMounted) {
         // 组件初始化的时候会执行这里
         // 为什么要在这里调用 render 函数呢
@@ -502,9 +513,8 @@ export function createRenderer(options) {
         console.log(`${instance.type.name}:调用 render,获取 subTree`);
         const proxyToUse = instance.proxy;
         // 可在 render 函数中通过 this 来使用 proxy
-        const subTree = (instance.subTree = normalizeVNode(
-          instance.render.call(proxyToUse, proxyToUse)
-        ));
+        const vnode = instance.render.call(proxyToUse, proxyToUse)
+        const subTree = (instance.subTree = normalizeVNode(vnode));
         console.log("subTree", subTree);
 
         // todo
@@ -569,8 +579,11 @@ export function createRenderer(options) {
     // 因为 ReactiveEffect 是内部对象，加一个参数是无所谓的
     // 后面如果要实现 scope 的逻辑的时候 需要改过来
     // 现在就先算了
+
+    // 这里就是对应渲染watcher
     instance.update = effect(componentUpdateFn, {
       scheduler: () => {
+        debugger
         // 把 effect 推到微任务的时候在执行
         // queueJob(effect);
         queueJob(instance.update);
@@ -579,6 +592,7 @@ export function createRenderer(options) {
   }
 
   function updateComponentPreRender(instance, nextVNode) {
+    debugger
     // 更新 nextVNode 的组件实例
     // 现在 instance.vnode 是组件实例更新前的
     // 所以之前的 props 就是基于 instance.vnode.props 来获取

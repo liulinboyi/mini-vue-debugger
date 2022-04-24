@@ -1,3 +1,5 @@
+import { isArray } from "../shared";
+
 const queue: any[] = [];
 
 const p = Promise.resolve();
@@ -27,12 +29,59 @@ function queueFlush() {
   nextTick(flushJobs);
 }
 
-function flushJobs() {
+function flushJobs(pendingQueue) {
   isFlushPending = false;
   let job;
+  if (pendingQueue) {
+    while ((job = pendingQueue.shift())) {
+      if (job) {
+        job();
+      }
+    }
+  }
   while ((job = queue.shift())) {
     if (job) {
       job();
     }
   }
 }
+
+let activePreFlushCbs = null
+const pendingPreFlushCbs = []
+let preFlushIndex = 0
+
+export function queuePreFlushCb(cb) {
+  queueCb(cb, activePreFlushCbs, pendingPreFlushCbs, preFlushIndex)
+}
+
+function queueCb(
+  cb,
+  activeQueue,
+  pendingQueue,
+  index: number
+) {
+  if (!isArray(cb)) {
+    if (
+      !activeQueue ||
+      !activeQueue.includes(cb, cb.allowRecurse ? index + 1 : index)
+    ) {
+      pendingQueue.push(cb)
+    }
+  } else {
+    // if cb is an array, it is a component lifecycle hook which can only be
+    // triggered by a job, which is already deduped in the main queue, so
+    // we can skip duplicate check here to improve perf
+    pendingQueue.push(...cb)
+  }
+  flushJobs(pendingQueue)
+}
+
+// function flushPreJobs(pendingQueue) {
+//   // isFlushPending = false;
+//   let job;
+//   while ((job = pendingQueue.shift())) {
+//     if (job) {
+//       job();
+//     }
+//   }
+// }

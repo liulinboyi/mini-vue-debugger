@@ -9,12 +9,14 @@ const targetMap = new WeakMap();
 export class ReactiveEffect {
   active = true;
   deps = [];
+  computed: any;
   public onStop?: () => void;
   constructor(public fn, public scheduler?) {
     console.log("创建 ReactiveEffect 对象");
   }
 
   run() {
+    debugger
     console.log("run");
     // 运行 run 的时候，可以控制 要不要执行后续收集依赖的一步
     // 目前来看的话，只要执行了 fn 那么就默认执行了收集依赖
@@ -68,6 +70,7 @@ function cleanupEffect(effect) {
 }
 
 export function effect(fn, options = {}) {
+  debugger
   const _effect = new ReactiveEffect(fn);
 
   // 把用户传过来的值合并到 _effect 对象上去
@@ -161,13 +164,25 @@ export function isTracking() {
 export function triggerEffects(dep) {
   // 执行收集到的所有的 effect 的 run 方法
   for (const effect of dep) {
-    if (effect.scheduler) {
-      // scheduler 可以让用户自己选择调用的时机
-      // 这样就可以灵活的控制调用了
-      // 在 runtime-core 中，就是使用了 scheduler 实现了在 next ticker 中调用的逻辑
-      effect.scheduler();
-    } else {
-      effect.run();
+    if (effect.computed) {
+      triggerEffect(effect)
     }
+  }
+
+  for (const effect of dep) {
+    if (!effect.computed) {
+      triggerEffect(effect)
+    }
+  }
+}
+
+function triggerEffect(effect) {
+  if (effect.scheduler) {
+    // scheduler 可以让用户自己选择调用的时机
+    // 这样就可以灵活的控制调用了
+    // 在 runtime-core 中，就是使用了 scheduler 实现了在 next ticker 中调用的逻辑
+    effect.scheduler();
+  } else {
+    effect.run();
   }
 }

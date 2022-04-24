@@ -4,6 +4,7 @@ import { emit } from "./componentEmits";
 import { PublicInstanceProxyHandlers } from "./componentPublicInstance";
 import { proxyRefs, shallowReadonly } from "../reactivity/src";
 export function createComponentInstance(vnode, parent) {
+  debugger
   const instance = {
     type: vnode.type,
     vnode,
@@ -35,6 +36,7 @@ export function createComponentInstance(vnode, parent) {
 }
 
 export function setupComponent(instance) {
+  debugger
   // 1. 处理 props
   // 取出存在 vnode 里面的 props
   const { props, children } = instance.vnode;
@@ -51,6 +53,7 @@ export function setupComponent(instance) {
 }
 
 function setupStatefulComponent(instance) {
+  debugger
   // todo
   // 1. 先创建代理 proxy
   console.log("创建 proxy");
@@ -96,6 +99,7 @@ function createSetupContext(instance) {
 }
 
 function handleSetupResult(instance, setupResult) {
+  debugger
   // setup 返回值不一样的话，会有不同的处理
   // 1. 看看 setupResult 是个什么
   if (typeof setupResult === "function") {
@@ -119,6 +123,7 @@ function handleSetupResult(instance, setupResult) {
 }
 
 function finishComponentSetup(instance) {
+  debugger
   // 给 instance 设置 render
 
   // 先取到用户设置的 component options
@@ -146,7 +151,7 @@ function applyOptions() {
   // options api
 }
 
-let currentInstance = {};
+export let currentInstance: Record<string, any> = {};
 // 这个接口暴露给用户，用户可以在 setup 中获取组件实例 instance
 export function getCurrentInstance(): any {
   return currentInstance;

@@ -6,6 +6,7 @@ import { createRenderer } from "../runtime-core";
 
 // 后面也修改成和源码一样的实现
 function createElement(type) {
+  debugger
   console.log("CreateElement", type);
   const element = document.createElement(type);
   return element;
@@ -25,6 +26,7 @@ function setElementText(el, text) {
 }
 
 function patchProp(el, key, preValue, nextValue) {
+  debugger
   // preValue 之前的值
   // 为了之后 update 做准备的值
   // nextValue 当前的值

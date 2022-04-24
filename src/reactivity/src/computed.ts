@@ -13,6 +13,7 @@ export class ComputedRefImpl {
     this._dirty = true;
     this.dep = createDep();
     this.effect = new ReactiveEffect(getter, () => {
+      debugger
       // scheduler
       // 只要触发了这个函数说明响应式对象的值发生改变了
       // 那么就解锁，后续在调用 get 的时候就会重新执行，所以会得到最新的值
@@ -21,6 +22,7 @@ export class ComputedRefImpl {
       this._dirty = true;
       triggerRefValue(this);
     });
+    this.effect.computed = this
   }
 
   get value() {

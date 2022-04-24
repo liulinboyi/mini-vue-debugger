@@ -4,6 +4,7 @@ import {
   shallowReadonlyHandlers,
 } from "./baseHandlers";
 
+/** 全局，存储响应式依赖关系 */
 export const reactiveMap = new WeakMap();
 export const readonlyMap = new WeakMap();
 export const shallowReadonlyMap = new WeakMap();
@@ -14,8 +15,9 @@ export const enum ReactiveFlags {
   RAW = "__v_raw",
 }
 
-export function reactive(target) {
-  return createReactiveObject(target, reactiveMap, mutableHandlers);
+export function reactive(target /** 被响应的值 */) {
+  debugger
+  return createReactiveObject(target /** 被响应的值 */, reactiveMap/** 全局，存储响应式依赖关系 */, mutableHandlers /** 可变的句柄 */);
 }
 
 export function readonly(target) {
@@ -60,7 +62,8 @@ export function toRaw(value) {
   return value[ReactiveFlags.RAW];
 }
 
-function createReactiveObject(target, proxyMap, baseHandlers) {
+function createReactiveObject(target /** 被响应的值 */, proxyMap, baseHandlers) {
+  debugger
   // 核心就是 proxy
   // 目的是可以侦听到用户 get 或者 set 的动作
 
@@ -76,4 +79,8 @@ function createReactiveObject(target, proxyMap, baseHandlers) {
   // 把创建好的 proxy 给存起来，
   proxyMap.set(target, proxy);
   return proxy;
+}
+
+export function isShallow(value: any): boolean {
+  return !!(value && value['__v_isShallow'])
 }

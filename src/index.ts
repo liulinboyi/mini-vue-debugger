@@ -6,6 +6,7 @@ import { registerRuntimeCompiler } from "./runtime-dom";
 import { baseCompile } from "./compiler-core/src";
 export * from "./reactivity/src";
 export * from "./runtime-dom";
+export * from './runtime-core/apiWatch'
 
 
 function compileToFunction(template, options = {}) {

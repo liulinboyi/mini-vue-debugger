@@ -10,6 +10,7 @@ export class RefImpl {
   public __v_isRef = true;
 
   constructor(value) {
+    debugger
     this._rawValue = value;
     // 看看value 是不是一个对象，如果是一个对象的话
     // 那么需要用 reactive 包裹一下
@@ -18,12 +19,14 @@ export class RefImpl {
   }
 
   get value() {
+    debugger
     // 收集依赖
     trackRefValue(this);
     return this._value;
   }
 
   set value(newValue) {
+    debugger
     // 当新的值不等于老的值的话，
     // 那么才需要触发依赖
     if (hasChanged(newValue, this._rawValue)) {
@@ -37,6 +40,7 @@ export class RefImpl {
 }
 
 export function ref(value) {
+  debugger
   return createRef(value);
 }
 
@@ -45,6 +49,7 @@ function convert(value) {
 }
 
 function createRef(value) {
+  debugger
   const refImpl = new RefImpl(value);
 
   return refImpl;

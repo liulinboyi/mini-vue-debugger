@@ -5,8 +5,28 @@ export const isObject = (val) => {
   return val !== null && typeof val === "object";
 };
 
+export const objectToString = Object.prototype.toString
+export const toTypeString = (value: unknown): string =>
+  objectToString.call(value)
 
-export const isString = (val)=> typeof val === "string"
+
+export const isArray = Array.isArray
+export const isMap = (val: unknown): val is Map<any, any> =>
+  toTypeString(val) === '[object Map]'
+export const isSet = (val: unknown): val is Set<any> =>
+  toTypeString(val) === '[object Set]'
+
+export const isDate = (val: unknown): val is Date => val instanceof Date
+export const isFunction = (val: unknown): val is Function =>
+  typeof val === 'function'
+export const isSymbol = (val: unknown): val is symbol => typeof val === 'symbol'
+
+export const isPromise = <T = any>(val: any): val is Promise<T> => {
+  return isObject(val) && isFunction(val.then) && isFunction(val.catch)
+}
+export const isPlainObject = (val: unknown): val is object =>
+  toTypeString(val) === '[object Object]'
+export const isString = (val) => typeof val === "string"
 
 const camelizeRE = /-(\w)/g;
 /**
@@ -43,3 +63,12 @@ export const capitalize = (str: string) =>
  */
 export const toHandlerKey = (str: string) =>
   str ? `on${capitalize(str)}` : ``;
+
+export const NOOP = () => { }
+
+export const remove = <T>(arr: T[], el: T) => {
+  const i = arr.indexOf(el)
+  if (i > -1) {
+    arr.splice(i, 1)
+  }
+}
